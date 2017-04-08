@@ -9,9 +9,7 @@ $(document).ready(function (){
   $("#roomSelect").change(function(){
     event.preventDefault();    
     var dropDownVal = $("#roomSelect").find(':selected').val();
-    console.log('dropdownVal', dropDownVal)
     if(dropDownVal === "add new room"){
-      console.log('went in')
       var newRoom = (prompt('Enter new room name'))
       app.renderRoom(newRoom);
     }
@@ -27,7 +25,6 @@ $(document).ready(function (){
 
 
 var app = {
-  
   init: function(){
     this.server = 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages';
     this.fetch();
@@ -41,7 +38,6 @@ var app = {
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: function (data) {
-        console.log('message',message);
         console.log('chatterbox: Message sent');
       },
       error: function (data) {
@@ -63,8 +59,7 @@ var app = {
 
       success: function (data) {       
         var results = data.results;
-        console.log(data);
-        if (roomName === 'All') {
+        if (roomName === 'All Mesg') {
           that.clearMessages();            
         } else if(roomName){
           that.clearMessages();
@@ -90,9 +85,11 @@ var app = {
     var $chatContainer = $('#chats')
     var $chat = $('<div>').addClass('chat').appendTo($chatContainer)
     var $userName = $('<div>').appendTo($chat).html(message.username).addClass('username');
+    
     if(app.friends.includes(message.username)){
       $userName.addClass('friend');
     }
+    
     $('<div>').appendTo($chat).text(message.text).addClass('text');
     $('<div>').appendTo($chat).text(message.roomname);
     $('<div>').appendTo($chat).text(message.createdAt);
@@ -100,44 +97,33 @@ var app = {
   renderRoom: function (roomName){
     var $roomSelect = $('#roomSelect');
     var $newRoomDrop = $('<option>').text(roomName).attr({'value': roomName});
+    
     $newRoomDrop.appendTo($roomSelect);
     $roomSelect.val(roomName);
+    
     return $("#roomSelect").val();
   },
   handleSubmit: function (){
     var inputText = $('#send').find('#message').val();
     var userName = window.location.search.split("=").slice(-1).toString();
-    
-    console.log('roomname', $("#roomSelect").val())
 
     var message = {'username': userName,
       'text': inputText,
       'roomname': $("#roomSelect").val()
     };
 
-    console.log(message);
-
-    app.send(message);
+    this.send(message);
     $('#send').find('#message').val('');
-    // app.clearMessages();
-    app.fetch();
-
+    this.clearMessages();
+    this.fetch();
   },
   handleUsernameClick: function (userName){
-    console.log('clicked on username')
     if(!app.friends.includes(userName)){
-      console.log('pushed');
       app.friends.push(userName);
     }
-    console.log(userName, app.friends);
     this.fetch();
   }
-
 };
 
-
-// app.init();
-// app.fetch();
-// setInterval(function(){app.init(); app.fetch()},3000);
 
 
