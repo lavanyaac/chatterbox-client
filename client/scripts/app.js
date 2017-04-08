@@ -1,26 +1,29 @@
 // YOUR CODE HERE:
+$(document).ready(function (){
+  app.init();
+  $("#send").on('submit', function(event){
+    event.preventDefault();
+    app.handleSubmit();  
+  });      
+
+  $("#roomSelect").change(function(){
+    $("#roomSelect").find(':selected').val();
+    app.fetch();
+  });
+
+  $("#chats").on('click', function(event){
+    event.preventDefault();
+    console.log('went in here');
+    app.handleUsernameClick();  
+  });      
+});
+
+
 var app = {
   
   init: function(){
     this.server = 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages';
-    $("#dropdown").change(function(){
-        $("#dropdown").find(':selected').val();
-        app.fetch();
-    });
-
-    $("#messageInput").on('submit', function(event){
-      console.log('hi')
-        event.preventDefault();
-        var inputText = $("input[name='messageInput']").val();
-        var message = {'username': window.location.search.split('=')[1],
-          'text': inputText,
-          'roomName': app.renderRoom()
-        };
-        console.log('this works')
-        app.send(message);
-        // app.clearMessages();
-        app.fetch();
-    });  
+    this.fetch();
   },
   send: function(message){
     $.ajax({
@@ -30,6 +33,7 @@ var app = {
       data: JSON.stringify(message),
       contentType: 'application/json',
       success: function (data) {
+        console.log('message',message);
         console.log('chatterbox: Message sent');
       },
       error: function (data) {
@@ -39,18 +43,21 @@ var app = {
     });
   },
   fetch: function(){
-    var roomName = this.renderRoom();
+    var roomName = $("#roomSelect").val();
 
     var that = this;
     $.ajax({
       // This is the url you should use to communicate with the parse API server.
       url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
       type: 'GET',
-      dataType: 'json',
+
+      data: {limit: 1000, order: '-createdAt'},
+      contentType: 'application/json',
+      // dataType: 'json',
 
       success: function (data) {       
         var results = data.results;
-        
+        console.log(data);
         if (roomName === 'All') {
           that.clearMessages();            
         } else if(roomName){
@@ -79,14 +86,37 @@ var app = {
     $('<div>').appendTo($chat).text(message.username).addClass('username');
     $('<div>').appendTo($chat).text(message.text).addClass('text');
     $('<div>').appendTo($chat).text(message.roomname);
+    $('<div>').appendTo($chat).text(message.createdAt);
   },
-  renderRoom: function (){
-    return $("#dropdown").val();
+  renderRoom: function (roomName){
+    var $roomSelect = $('#roomSelect');
+    var $newRoomDrop = $('<option>').val(roomName);
+    $newRoomDrop.appendTo($roomSelect);
+    return $("#roomSelect").val();
+  },
+  handleSubmit: function (){
+    var inputText = $('#send').find('#message').val();
+    console.log('inputText', inputText);
+    var userName = window.location.search.split("=").slice(-1).toString();
+    var message = {'username': userName,
+      'text': inputText,
+      'roomName': 'Lobby'
+    };
+    console.log(message);
+    app.send(message);
+    app.clearMessages();
+    app.fetch();
+  },
+  handleUsernameClick: function (){
+    console.log('clicked on username')
   }
 
 };
 
-setInterval(function(){return app.fetch()},5000);
+
+// app.init();
+// app.fetch();
+// setInterval(function(){app.init(); app.fetch()},3000);
 
 
 
