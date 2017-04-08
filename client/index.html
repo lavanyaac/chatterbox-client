@@ -28,20 +28,16 @@
       <h1>chatterbox</h1>
       <!-- Your HTML goes here! -->
       <select id='dropdown' >
-        <option value='4chan' onchange = "dropDownClick()">4chan</option>
-        <option value='2'>2</option>
-
+        <option value='All'>All</option>
+        <option value='4chan'>4chan</option>
+        <option value='Lobby'>Lobby</option>
+        <option value='lobby'>lobby</option>
+        <option value='Death Star'>Death Star</option>
       </select>
-
-
-     <!--  <div class="dropdown">
-        <button onclick="dropownClick()" class="dropbtn">Dropdown</button>
-        <div id="myDropdown" class="dropdown-content">
-          <a href="#" value='4chan'>4chan</a>
-          <a href="#">Link 2</a>
-          <a href="#">Link 3</a>
-        </div>
-      </div> -->
+      <form id='messageInput'>
+        <input id='message' type="text" name="inputMessage" value=''>
+        <input id='send' class='submit' type="submit" name="submitButton" >        
+      </form>
 
     </div>
     <div id="chats">
